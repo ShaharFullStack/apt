@@ -7,37 +7,44 @@
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
     <meta name="theme-color" content="#123B46" />
-    <title>הדירות שלנו — שחר וענבל</title>
+    <title id="pageTitleTag">התסקיר שלנו</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
     <a class="skip-link" href="#board">דלגו לרשימת הדירות</a>
 
     <header class="site-head">
       <div class="head-inner">
-        <a class="brand" href="#" aria-label="הדירות שלנו — דף הבית">
+        <a class="brand" href="#" aria-label="דף הבית">
           <span class="brand-mark" aria-hidden="true">
             <svg viewBox="0 0 24 24">
               <path d="m4 11 8-7 8 7v9h-6v-6h-4v6H4z" />
             </svg>
           </span>
           <span class="brand-copy">
-            <strong>הדירות שלנו</strong>
-            <span>שחר + ענבל</span>
+            <strong id="brandTitle">התסקיר שלנו</strong>
+            <span id="brandSub">תסקיר דירות קבוצתי</span>
           </span>
         </a>
 
+        <nav class="view-tabs" aria-label="ניווט בין תצוגות">
+          <button class="view-tab" id="tabBoard" type="button" aria-pressed="true">דירות</button>
+          <button class="view-tab" id="tabDashboard" type="button" aria-pressed="false">דאשבורד</button>
+        </nav>
+
         <div class="head-actions">
-          <div class="field-mode" aria-label="מצב שימוש: בביקור">
-            <span class="live-dot" aria-hidden="true"></span>
-            מצב ביקור
-          </div>
+          <button class="btn btn-icon" id="openSettingsBtn" type="button" aria-label="ניהול מדרגים והגדרות">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" />
+            </svg>
+          </button>
           <button
             class="btn btn-primary desktop-add"
             id="openAddBtn"
@@ -53,53 +60,59 @@
     </header>
 
     <main class="page-shell">
-      <section class="overview" aria-labelledby="pageTitle">
-        <div class="overview-copy">
-          <p class="eyebrow">מרכז ההחלטות שלנו</p>
-          <h1 id="pageTitle">הדירות שראינו</h1>
-          <p>כל מה שצריך כדי לזכור, להשוות ולהחליט — גם תוך כדי הביקור.</p>
-        </div>
-        <div class="overview-stats" aria-label="סיכום דירות">
-          <div class="stat-card">
-            <span class="stat-number" id="statCount">0</span>
-            <span class="stat-label">דירות בתיק</span>
+      <div id="boardView">
+        <section class="overview" aria-labelledby="pageTitle">
+          <div class="overview-copy">
+            <p class="eyebrow">מרכז ההחלטות של הקבוצה</p>
+            <h1 id="pageTitle">הדירות שראינו</h1>
+            <p>כל מה שצריך כדי לזכור, להשוות ולהחליט — גם תוך כדי הביקור.</p>
           </div>
-          <div class="stat-card stat-card-accent">
-            <span class="stat-number" id="strongCount">0</span>
-            <span class="stat-label">מועמדות חזקות</span>
+          <div class="overview-stats" aria-label="סיכום דירות">
+            <div class="stat-card">
+              <span class="stat-number" id="statCount">0</span>
+              <span class="stat-label">דירות בתיק</span>
+            </div>
+            <div class="stat-card stat-card-accent">
+              <span class="stat-number" id="strongCount">0</span>
+              <span class="stat-label">מועמדות חזקות</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="list-heading" aria-labelledby="listTitle">
+          <div>
+            <p class="eyebrow">תמונה מהירה</p>
+            <h2 id="listTitle">כל הדירות</h2>
+          </div>
+          <p class="list-hint">לחצו על דירה כדי לפתוח את פרטי הביקור</p>
+        </section>
+
+        <div class="board" id="board">
+          <!-- apartment cards injected here -->
+        </div>
+
+        <div class="empty-state" id="emptyState" hidden>
+          <div class="empty-card">
+            <span class="empty-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-7h6v7" />
+              </svg>
+            </span>
+            <p class="eyebrow">מתחילים מכאן</p>
+            <h2>הדירה הראשונה מחכה לכם</h2>
+            <p>הוסיפו כתובת, תמונות וציונים בזמן הביקור. הכול נשמר אוטומטית.</p>
+            <button class="btn btn-primary empty-add" type="button">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              הוספת דירה ראשונה
+            </button>
           </div>
         </div>
-      </section>
-
-      <section class="list-heading" aria-labelledby="listTitle">
-        <div>
-          <p class="eyebrow">תמונה מהירה</p>
-          <h2 id="listTitle">כל הדירות</h2>
-        </div>
-        <p class="list-hint">לחצו על דירה כדי לפתוח את פרטי הביקור</p>
-      </section>
-
-      <div class="board" id="board">
-        <!-- apartment cards injected here -->
       </div>
 
-      <div class="empty-state" id="emptyState" hidden>
-        <div class="empty-card">
-          <span class="empty-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-7h6v7" />
-            </svg>
-          </span>
-          <p class="eyebrow">מתחילים מכאן</p>
-          <h2>הדירה הראשונה מחכה לכם</h2>
-          <p>הוסיפו כתובת, תמונות וציונים בזמן הביקור. הכול נשמר אוטומטית.</p>
-          <button class="btn btn-primary empty-add" type="button">
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            הוספת דירה ראשונה
-          </button>
-        </div>
+      <div id="dashboardView" hidden>
+        <!-- dashboard injected here by app.js -->
       </div>
     </main>
 
@@ -342,8 +355,84 @@
       </div>
     </div>
 
+    <!-- Settings modal: group name + raters management -->
+    <div class="modal-overlay" id="settingsOverlay" hidden>
+      <div
+        class="modal modal-narrow"
+        id="settingsModal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="settingsTitle"
+      >
+        <header class="modal-head">
+          <button
+            class="modal-close"
+            id="settingsClose"
+            type="button"
+            aria-label="סגירת הגדרות"
+          >
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m7 7 10 10M17 7 7 17" />
+            </svg>
+          </button>
+          <div class="modal-title-wrap">
+            <span class="modal-kicker">הגדרות</span>
+            <h2 id="settingsTitle">הקבוצה שלכם</h2>
+          </div>
+        </header>
+
+        <div class="modal-scroll">
+          <section class="m-section">
+            <div class="section-heading">
+              <span class="section-index">01</span>
+              <div>
+                <h3>שיתוף עם הקבוצה</h3>
+                <p>כל מי שיש לו את הקישור הזה יכול לראות ולדרג יחד איתכם.</p>
+              </div>
+            </div>
+            <div class="share-row">
+              <input type="text" id="f_shareLink" readonly dir="ltr" />
+              <button class="btn btn-primary btn-small" id="copyShareLinkBtn" type="button">העתקת קישור</button>
+            </div>
+          </section>
+
+          <section class="m-section">
+            <div class="section-heading">
+              <span class="section-index">02</span>
+              <div>
+                <h3>שם התסקיר</h3>
+                <p>יופיע בכותרת העליונה של כולם.</p>
+              </div>
+            </div>
+            <div class="field field-wide">
+              <label for="f_groupName">שם התסקיר</label>
+              <input type="text" id="f_groupName" placeholder="למשל: התסקיר של דנה, יובל וטל" />
+            </div>
+          </section>
+
+          <section class="m-section">
+            <div class="section-heading">
+              <span class="section-index">03</span>
+              <div>
+                <h3>מי מדרג?</h3>
+                <p>הוסיפו את כל מי שנותן ציונים — זוג, משפחה או שותפים.</p>
+              </div>
+            </div>
+            <div class="raters-list" id="ratersList"></div>
+            <button class="btn btn-ghost btn-small" id="addRaterBtn" type="button">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              הוספת מדרג/ת
+            </button>
+          </section>
+        </div>
+      </div>
+    </div>
+
     <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-    <script src="app.js"></script>
+    <script src="/dashboard.js"></script>
+    <script src="/app.js"></script>
   </body>
 </html>

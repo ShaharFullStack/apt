@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#123B46" />
+    <title>תסקיר דירות — לדרג יחד, להחליט ביחד</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="landing.css" />
+  </head>
+  <body class="landing-body">
+    <header class="site-head">
+      <div class="head-inner">
+        <a class="brand" href="/" aria-label="תסקיר דירות — דף הבית">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="m4 11 8-7 8 7v9h-6v-6h-4v6H4z" />
+            </svg>
+          </span>
+          <span class="brand-copy">
+            <strong>תסקיר דירות</strong>
+            <span>לדרג יחד, להחליט ביחד</span>
+          </span>
+        </a>
+      </div>
+    </header>
+
+    <main class="landing-shell">
+      <section class="landing-hero">
+        <p class="eyebrow">בלי הרשמה, בלי אפליקציה — רק קישור אחד</p>
+        <h1>מחפשים דירה יחד עם עוד אנשים?</h1>
+        <p class="landing-lede">
+          זוג, משפחה או שותפים לדירה — כל אחד נותן ציונים משלו לכל דירה
+          שראיתם, ובסוף מקבלים דאשבורד אחד עם השוואות, גרפים ותובנות: מי
+          הכי זולה, מי הכי יקרה ומי נותנת הכי הרבה ערך תמורה למחיר.
+        </p>
+        <button class="btn btn-primary landing-cta" id="createBoardBtn" type="button">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          פתיחת תסקיר חדש
+        </button>
+        <p class="landing-hint">
+          כבר יש לכם קישור לתסקיר ששיתפו איתכם? פתחו אותו ישירות — הוא מוביל
+          ישר לנתונים שלכם.
+        </p>
+      </section>
+
+      <section class="landing-features" aria-label="איך זה עובד">
+        <div class="landing-feature">
+          <span class="landing-feature-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 7h3l1.5-2h7L17 7h3v12H4z" />
+              <circle cx="12" cy="13" r="3" />
+            </svg>
+          </span>
+          <h3>תיעוד כל ביקור</h3>
+          <p>תמונות, מחיר, ארנונה, ועד בית ופרטי קשר — הכול במקום אחד.</p>
+        </div>
+        <div class="landing-feature">
+          <span class="landing-feature-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+              <path d="M4 21c0-4 3.6-7 8-7s8 3 8 7" />
+            </svg>
+          </span>
+          <h3>כל אחד מדרג בעצמו</h3>
+          <p>הוסיפו את כל בני הקבוצה, וכל אחד נותן ציון 1–10 לכל קטגוריה.</p>
+        </div>
+        <div class="landing-feature">
+          <span class="landing-feature-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 20V10M12 20V4m8 16v-7" />
+            </svg>
+          </span>
+          <h3>דאשבורד עם תובנות</h3>
+          <p>הכי זולה, הכי יקרה, הכי משתלמת — עם גרפים שמשווים בין הדירות.</p>
+        </div>
+      </section>
+
+      <p class="landing-privacy">
+        התסקיר שלכם נגיש רק דרך הקישור הייחודי שלו. שמרו אותו ושתפו אותו רק
+        עם מי שאתם רוצים שיראה וידרג את הדירות.
+      </p>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <script src="landing.js"></script>
+  </body>
+</html>

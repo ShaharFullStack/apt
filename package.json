@@ -1,7 +1,7 @@
 {
   "name": "apartment-rater",
   "version": "1.0.0",
-  "description": "אפליקציה לדירוג דירות לשכירות בין שני משתמשים",
+  "description": "אפליקציית תסקיר לדירוג דירות לשכירות בקבוצה — זוג, משפחה או שותפים",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
