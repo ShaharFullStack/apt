@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS apartments (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL DEFAULT '',
   address TEXT NOT NULL DEFAULT '',
+  rooms REAL,
   price INTEGER,
   arnona INTEGER,
   vaad_bayit INTEGER,
@@ -56,6 +57,12 @@ CREATE TABLE IF NOT EXISTS images (
   FOREIGN KEY (apartment_id) REFERENCES apartments(id) ON DELETE CASCADE
 );
 `);
+
+// Existing databases predate the rooms field. Add it once without touching saved rows.
+const apartmentColumns = db.prepare('PRAGMA table_info(apartments)').all();
+if (!apartmentColumns.some(column => column.name === 'rooms')) {
+  db.exec('ALTER TABLE apartments ADD COLUMN rooms REAL');
+}
 
 // Seed default categories if none exist
 const catCount = db.prepare('SELECT COUNT(*) AS c FROM categories').get().c;
@@ -146,12 +153,13 @@ app.post('/api/apartments', (req, res) => {
   const id = crypto.randomUUID();
   const b = req.body || {};
   db.prepare(`INSERT INTO apartments
-    (id, title, address, price, arnona, vaad_bayit, contact_name, contact_phone, pros, cons, status, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+    (id, title, address, rooms, price, arnona, vaad_bayit, contact_name, contact_phone, pros, cons, status, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
     .run(
       id,
       b.title || '',
       b.address || '',
+      b.rooms ?? null,
       b.price || null,
       b.arnona || null,
       b.vaad_bayit || null,
@@ -171,11 +179,11 @@ app.put('/api/apartments/:id', (req, res) => {
   const b = req.body || {};
   const merged = { ...existing, ...b };
   db.prepare(`UPDATE apartments SET
-      title = ?, address = ?, price = ?, arnona = ?, vaad_bayit = ?,
+      title = ?, address = ?, rooms = ?, price = ?, arnona = ?, vaad_bayit = ?,
       contact_name = ?, contact_phone = ?, pros = ?, cons = ?, status = ?
       WHERE id = ?`)
     .run(
-      merged.title, merged.address, merged.price || null, merged.arnona || null, merged.vaad_bayit || null,
+      merged.title, merged.address, merged.rooms ?? null, merged.price || null, merged.arnona || null, merged.vaad_bayit || null,
       merged.contact_name, merged.contact_phone, merged.pros, merged.cons, merged.status,
       req.params.id
     );

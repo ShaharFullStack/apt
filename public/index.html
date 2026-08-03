@@ -1,125 +1,349 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="he" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>מארז הדירות — שחר וענבל</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Heebo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#123B46" />
+    <title>הדירות שלנו — שחר וענבל</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#board">דלגו לרשימת הדירות</a>
 
-<div class="tape tape-a"></div>
-<div class="tape tape-b"></div>
+    <header class="site-head">
+      <div class="head-inner">
+        <a class="brand" href="#" aria-label="הדירות שלנו — דף הבית">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="m4 11 8-7 8 7v9h-6v-6h-4v6H4z" />
+            </svg>
+          </span>
+          <span class="brand-copy">
+            <strong>הדירות שלנו</strong>
+            <span>שחר + ענבל</span>
+          </span>
+        </a>
 
-<header class="site-head">
-  <div class="head-inner">
-    <div class="head-title">
-      <span class="eyebrow">יומן חיפוש דירה</span>
-      <h1>מארז הדירות</h1>
-      <p class="subtitle">כל דירה שראינו — תמונה, מחיר, ודירוג של שחר ושל ענבל, זו לצד זו.</p>
+        <div class="head-actions">
+          <div class="field-mode" aria-label="מצב שימוש: בביקור">
+            <span class="live-dot" aria-hidden="true"></span>
+            מצב ביקור
+          </div>
+          <button
+            class="btn btn-primary desktop-add"
+            id="openAddBtn"
+            type="button"
+          >
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            הוספת דירה
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="page-shell">
+      <section class="overview" aria-labelledby="pageTitle">
+        <div class="overview-copy">
+          <p class="eyebrow">מרכז ההחלטות שלנו</p>
+          <h1 id="pageTitle">הדירות שראינו</h1>
+          <p>כל מה שצריך כדי לזכור, להשוות ולהחליט — גם תוך כדי הביקור.</p>
+        </div>
+        <div class="overview-stats" aria-label="סיכום דירות">
+          <div class="stat-card">
+            <span class="stat-number" id="statCount">0</span>
+            <span class="stat-label">דירות בתיק</span>
+          </div>
+          <div class="stat-card stat-card-accent">
+            <span class="stat-number" id="strongCount">0</span>
+            <span class="stat-label">מועמדות חזקות</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="list-heading" aria-labelledby="listTitle">
+        <div>
+          <p class="eyebrow">תמונה מהירה</p>
+          <h2 id="listTitle">כל הדירות</h2>
+        </div>
+        <p class="list-hint">לחצו על דירה כדי לפתוח את פרטי הביקור</p>
+      </section>
+
+      <div class="board" id="board">
+        <!-- apartment cards injected here -->
+      </div>
+
+      <div class="empty-state" id="emptyState" hidden>
+        <div class="empty-card">
+          <span class="empty-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-7h6v7" />
+            </svg>
+          </span>
+          <p class="eyebrow">מתחילים מכאן</p>
+          <h2>הדירה הראשונה מחכה לכם</h2>
+          <p>הוסיפו כתובת, תמונות וציונים בזמן הביקור. הכול נשמר אוטומטית.</p>
+          <button class="btn btn-primary empty-add" type="button">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            הוספת דירה ראשונה
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <button class="mobile-add" id="mobileAddBtn" type="button">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+      הוספת דירה
+    </button>
+
+    <!-- Apartment detail / edit modal -->
+    <div class="modal-overlay" id="modalOverlay" hidden>
+      <div
+        class="modal"
+        id="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+      >
+        <header class="modal-head">
+          <button
+            class="modal-close"
+            id="modalClose"
+            type="button"
+            aria-label="סגירת פרטי הדירה"
+          >
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m7 7 10 10M17 7 7 17" />
+            </svg>
+          </button>
+          <div class="modal-title-wrap">
+            <span class="modal-kicker">כרטיס ביקור</span>
+            <h2 id="modalTitle">פרטי הדירה</h2>
+          </div>
+          <div class="autosave-state" id="autosaveState" aria-live="polite">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m5 12 4 4L19 6" />
+            </svg>
+            נשמר אוטומטית
+          </div>
+        </header>
+
+        <div class="modal-scroll">
+          <section class="m-section m-hero" aria-labelledby="photosTitle">
+            <div class="section-heading">
+              <span class="section-index">01</span>
+              <div>
+                <h3 id="photosTitle">תמונות מהביקור</h3>
+                <p>הוסיפו עכשיו, לפני ששוכחים את הפרטים.</p>
+              </div>
+            </div>
+            <div class="photo-strip">
+              <div class="gallery" id="gallery"></div>
+              <label class="upload-tile">
+                <input
+                  type="file"
+                  id="imageInput"
+                  accept="image/*"
+                  multiple
+                  hidden
+                />
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 7h3l1.5-2h7L17 7h3v12H4z" />
+                  <circle cx="12" cy="13" r="3" />
+                  <path d="M19 3v4M17 5h4" />
+                </svg>
+                <span>הוספת תמונות</span>
+              </label>
+            </div>
+          </section>
+
+          <section class="m-section m-facts" aria-labelledby="factsTitle">
+            <div class="section-heading">
+              <span class="section-index">02</span>
+              <div>
+                <h3 id="factsTitle">הפרטים החשובים</h3>
+                <p>מחיר, קשר וסטטוס במקום אחד.</p>
+              </div>
+            </div>
+
+            <div class="field field-wide">
+              <label for="f_title">כותרת או כתובת</label>
+              <input
+                type="text"
+                id="f_title"
+                placeholder="למשל: רוטשילד 12, קומה 3"
+                autocomplete="street-address"
+              />
+            </div>
+            <div class="field-grid field-grid-pricing">
+              <div class="field money-field">
+                <label for="f_price">שכירות חודשית</label>
+                <div class="input-unit">
+                  <input
+                    type="number"
+                    id="f_price"
+                    placeholder="6,500"
+                    inputmode="numeric"
+                  /><span>₪</span>
+                </div>
+              </div>
+              <div class="field money-field">
+                <label for="f_arnona">ארנונה לחודש</label>
+                <div class="input-unit">
+                  <input
+                    type="number"
+                    id="f_arnona"
+                    placeholder="350"
+                    inputmode="numeric"
+                  /><span>₪</span>
+                </div>
+              </div>
+              <div class="field money-field">
+                <label for="f_vaad">ועד בית</label>
+                <div class="input-unit">
+                  <input
+                    type="number"
+                    id="f_vaad"
+                    placeholder="80"
+                    inputmode="numeric"
+                  /><span>₪</span>
+                </div>
+              </div>
+              <div class="field rooms-field">
+                <label for="f_rooms">מספר חדרים</label>
+                <div>
+                  <input
+                    type="number"
+                    id="f_rooms"
+                    placeholder="למשל 3.5"
+                    inputmode="decimal"
+                    min="0"
+                    max="20"
+                    step="0.5"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="field-grid field-grid-3">
+              <div class="field">
+                <label for="f_contact_name">איש או אשת קשר</label>
+                <input
+                  type="text"
+                  id="f_contact_name"
+                  placeholder="שם המתווך או המשכיר"
+                  autocomplete="name"
+                />
+              </div>
+              <div class="field">
+                <label for="f_contact_phone">טלפון</label>
+                <input
+                  type="tel"
+                  id="f_contact_phone"
+                  placeholder="050-0000000"
+                  inputmode="tel"
+                  autocomplete="tel"
+                  dir="ltr"
+                />
+              </div>
+              <div class="field">
+                <label for="f_status">איפה זה עומד?</label>
+                <select id="f_status">
+                  <option>בבדיקה</option>
+                  <option>מועמדת חזקה</option>
+                  <option>נפסלה</option>
+                  <option>הוגשה הצעה</option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          <section class="m-section m-ratings" aria-labelledby="ratingsTitle">
+            <div class="section-heading">
+              <span class="section-index">03</span>
+              <div>
+                <h3 id="ratingsTitle">הציונים שלנו</h3>
+                <p>1 חלש, 10 מעולה. כל אחד מדרג בנפרד.</p>
+              </div>
+            </div>
+            <div class="ratings-table" id="ratingsTable"></div>
+            <button
+              class="btn btn-ghost btn-small"
+              id="addCategoryBtn"
+              type="button"
+            >
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              קטגוריה חדשה
+            </button>
+          </section>
+
+          <section class="m-section m-notes" aria-labelledby="notesTitle">
+            <div class="section-heading">
+              <span class="section-index">04</span>
+              <div>
+                <h3 id="notesTitle">מה נרצה לזכור?</h3>
+                <p>רושמים חופשי, בדיוק כמו שזה מרגיש עכשיו.</p>
+              </div>
+            </div>
+            <div class="notes-grid">
+              <div class="field note-field note-positive">
+                <label for="f_pros">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m5 12 4 4L19 6" />
+                  </svg>
+                  מה אהבנו
+                </label>
+                <textarea
+                  id="f_pros"
+                  rows="4"
+                  placeholder="אור טבעי, רחוב שקט, סלון מרווח..."
+                ></textarea>
+              </div>
+              <div class="field note-field note-negative">
+                <label for="f_cons">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m7 7 10 10M17 7 7 17" />
+                  </svg>
+                  מה פחות עבד
+                </label>
+                <textarea
+                  id="f_cons"
+                  rows="4"
+                  placeholder="מטבח קטן, בלי מעלית, רועש בבוקר..."
+                ></textarea>
+              </div>
+            </div>
+          </section>
+
+          <section class="m-section m-danger">
+            <button class="btn btn-danger-text" id="deleteBtn" type="button">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5" />
+              </svg>
+              מחיקת הדירה מהתיק
+            </button>
+          </section>
+        </div>
+      </div>
     </div>
-    <div class="head-actions">
-      <div class="stat-pill" id="statCount">0 דירות בתיק</div>
-      <button class="btn btn-primary" id="openAddBtn">+ דירה חדשה</button>
-    </div>
-  </div>
-</header>
 
-<main class="board" id="board">
-  <!-- apartment cards injected here -->
-</main>
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-<div class="empty-state" id="emptyState" hidden>
-  <div class="empty-card">
-    <p class="empty-kicker">התיק ריק</p>
-    <h2>עוד לא הוספתם דירה</h2>
-    <p>כל דירה שתראו היום — תמונה, מספר טלפון, ודירוג מהיר. תלחצו על "דירה חדשה" למעלה.</p>
-  </div>
-</div>
-
-<!-- Apartment detail / edit modal -->
-<div class="modal-overlay" id="modalOverlay" hidden>
-  <div class="modal" id="modal" role="dialog" aria-modal="true">
-    <button class="modal-close" id="modalClose" aria-label="סגור">✕</button>
-
-    <div class="modal-scroll">
-      <section class="m-section m-hero">
-        <div class="gallery" id="gallery"></div>
-        <label class="upload-tile">
-          <input type="file" id="imageInput" accept="image/*" multiple hidden>
-          <span class="upload-icon">＋</span>
-          <span>הוספת תמונות</span>
-        </label>
-      </section>
-
-      <section class="m-section m-facts">
-        <div class="field">
-          <label>כותרת / כתובת</label>
-          <input type="text" id="f_title" placeholder="לדוגמה: רוטשילד 12, קומה 3">
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label>מחיר חודשי (₪)</label>
-            <input type="number" id="f_price" placeholder="6500">
-          </div>
-          <div class="field">
-            <label>ארנונה (₪ לחודש)</label>
-            <input type="number" id="f_arnona" placeholder="350">
-          </div>
-          <div class="field">
-            <label>ועד בית (₪ לחודש)</label>
-            <input type="number" id="f_vaad" placeholder="80">
-          </div>
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label>איש קשר</label>
-            <input type="text" id="f_contact_name" placeholder="שם המתווך / המשכיר">
-          </div>
-          <div class="field">
-            <label>טלפון</label>
-            <input type="text" id="f_contact_phone" placeholder="050-0000000">
-          </div>
-          <div class="field">
-            <label>סטטוס</label>
-            <select id="f_status">
-              <option>בבדיקה</option>
-              <option>מועמדת חזקה</option>
-              <option>נפסלה</option>
-              <option>הוגשה הצעה</option>
-            </select>
-          </div>
-        </div>
-      </section>
-
-      <section class="m-section m-ratings">
-        <h3 class="section-title">כרטיס ציונים <span class="section-title-sub">1 (חלש) – 10 (מעולה)</span></h3>
-        <div class="ratings-table" id="ratingsTable"></div>
-        <button class="btn btn-ghost btn-small" id="addCategoryBtn">+ קטגוריה חדשה</button>
-      </section>
-
-      <section class="m-section m-notes">
-        <div class="field">
-          <label class="pros-label">✓ יתרונות</label>
-          <textarea id="f_pros" rows="3" placeholder="מה טוב בדירה הזו?"></textarea>
-        </div>
-        <div class="field">
-          <label class="cons-label">✕ חסרונות</label>
-          <textarea id="f_cons" rows="3" placeholder="מה פחות טוב?"></textarea>
-        </div>
-      </section>
-
-      <section class="m-section m-danger">
-        <button class="btn btn-danger-text" id="deleteBtn">מחיקת הדירה מהתיק</button>
-      </section>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast" hidden></div>
-
-<script src="app.js"></script>
-</body>
+    <script src="app.js"></script>
+  </body>
 </html>

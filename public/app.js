@@ -8,6 +8,18 @@ const state = {
 const board = document.getElementById('board');
 const emptyState = document.getElementById('emptyState');
 const statCount = document.getElementById('statCount');
+const strongCount = document.getElementById('strongCount');
+const autosaveState = document.getElementById('autosaveState');
+const modalTitle = document.getElementById('modalTitle');
+let lastFocusedElement = null;
+
+const icons = {
+  arrow: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg>',
+  camera: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l1.5-2h7L17 7h3v12H4z"/><circle cx="12" cy="13" r="3"/></svg>',
+  check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>',
+  close: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg>',
+};
 
 async function api(path, opts) {
   const res = await fetch(path, opts);
@@ -39,6 +51,14 @@ function fmtMoney(n) {
   return '₪' + Number(n).toLocaleString('he-IL');
 }
 
+function fmtRooms(value) {
+  if (value === null || value === undefined || value === '') return '';
+  const rooms = Number(value);
+  if (!Number.isFinite(rooms)) return '';
+  const label = rooms === 1 ? 'חדר' : 'חדרים';
+  return `${rooms.toLocaleString('he-IL', { maximumFractionDigits: 1 })} ${label}`;
+}
+
 function statusClass(status) {
   return 'st-' + (status || '').replace(/\s+/g, '-');
 }
@@ -57,51 +77,85 @@ async function loadAll() {
 
 function render() {
   board.innerHTML = '';
-  statCount.textContent = `${state.apartments.length} דירות בתיק`;
+  statCount.textContent = state.apartments.length;
+  strongCount.textContent = state.apartments.filter(apt => apt.status === 'מועמדת חזקה').length;
   emptyState.hidden = state.apartments.length !== 0;
 
   state.apartments.forEach(apt => {
     const card = document.createElement('article');
     card.className = 'acard';
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', `פתיחת פרטי ${apt.title || apt.address || 'הדירה'}`);
     card.addEventListener('click', () => openModal(apt.id));
+    card.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        openModal(apt.id);
+      }
+    });
 
     const thumb = document.createElement('div');
     thumb.className = 'thumb';
     if (apt.images.length) {
       const img = document.createElement('img');
       img.src = '/uploads/' + apt.images[0].filename;
+      img.alt = `תמונה של ${apt.title || apt.address || 'הדירה'}`;
+      img.loading = 'lazy';
       thumb.appendChild(img);
     } else {
-      thumb.textContent = 'אין תמונה עדיין';
+      const noPhoto = document.createElement('div');
+      noPhoto.className = 'no-photo';
+      noPhoto.innerHTML = `${icons.camera}<span>אין תמונה עדיין</span>`;
+      thumb.appendChild(noPhoto);
     }
     const stamp = document.createElement('span');
     stamp.className = 'stamp ' + statusClass(apt.status);
-    stamp.textContent = apt.status;
+    stamp.textContent = apt.status || 'בבדיקה';
     thumb.appendChild(stamp);
+
+    if (apt.images.length) {
+      const photoCount = document.createElement('span');
+      photoCount.className = 'photo-count';
+      photoCount.innerHTML = `${icons.camera}<span>${apt.images.length}</span>`;
+      photoCount.setAttribute('aria-label', `${apt.images.length} תמונות`);
+      thumb.appendChild(photoCount);
+    }
     card.appendChild(thumb);
 
     const body = document.createElement('div');
     body.className = 'body';
 
+    const heading = document.createElement('div');
+    heading.className = 'card-heading';
     const title = document.createElement('h3');
     title.className = 'title';
-    title.textContent = apt.title || apt.address || 'דירה ללא כותרת';
-    body.appendChild(title);
+    title.textContent = apt.title || apt.address || 'דירה חדשה';
+    const arrow = document.createElement('span');
+    arrow.className = 'card-arrow';
+    arrow.innerHTML = icons.arrow;
+    arrow.setAttribute('aria-hidden', 'true');
+    heading.appendChild(title);
+    heading.appendChild(arrow);
+    body.appendChild(heading);
 
     const money = document.createElement('div');
     money.className = 'money-row';
+    const roomsText = fmtRooms(apt.rooms);
     money.innerHTML = `
-      <span><b>${fmtMoney(apt.price)}</b> לחודש</span>
+      <span class="money-main">${fmtMoney(apt.price)}</span>
+      <span>לחודש</span>
+      ${roomsText ? `<span class="rooms-count">${roomsText}</span>` : ''}
+      <span class="money-separator">/</span>
       <span>ארנונה ${fmtMoney(apt.arnona)}</span>
-      <span>ועד ${fmtMoney(apt.vaad_bayit)}</span>
-    `;
+      <span>ועד ${fmtMoney(apt.vaad_bayit)}</span>`;
     body.appendChild(money);
 
     if (apt.pros || apt.cons) {
       const pc = document.createElement('div');
       pc.className = 'pc-preview';
-      if (apt.pros) pc.innerHTML += `<div class="p">✓ ${escapeHtml(truncate(apt.pros, 70))}</div>`;
-      if (apt.cons) pc.innerHTML += `<div class="c">✕ ${escapeHtml(truncate(apt.cons, 70))}</div>`;
+      if (apt.pros) pc.innerHTML += `<div class="p">${icons.check}<span>${escapeHtml(truncate(apt.pros, 70))}</span></div>`;
+      if (apt.cons) pc.innerHTML += `<div class="c">${icons.close}<span>${escapeHtml(truncate(apt.cons, 70))}</span></div>`;
       body.appendChild(pc);
     }
 
@@ -111,7 +165,7 @@ function render() {
       const avg = avgFor(apt, r);
       const chip = document.createElement('div');
       chip.className = 'score-chip' + (avg === null ? ' empty' : '');
-      chip.innerHTML = `<div class="who">${r}</div><div class="num">${avg === null ? '–' : avg.toFixed(1)}</div>`;
+      chip.innerHTML = `<div class="who">${escapeHtml(r)}</div><div><span class="num">${avg === null ? '–' : avg.toFixed(1)}</span><span class="out-of">/10</span></div>`;
       scoreRow.appendChild(chip);
     });
     body.appendChild(scoreRow);
@@ -131,10 +185,11 @@ const overlay = document.getElementById('modalOverlay');
 const galleryEl = document.getElementById('gallery');
 const ratingsTableEl = document.getElementById('ratingsTable');
 
-const fields = ['title', 'price', 'arnona', 'vaad', 'contact_name', 'contact_phone', 'status', 'pros', 'cons'];
+const fields = ['title', 'rooms', 'price', 'arnona', 'vaad', 'contact_name', 'contact_phone', 'status', 'pros', 'cons'];
 function fieldEl(name) { return document.getElementById('f_' + name); }
 
 async function openModal(id) {
+  lastFocusedElement = document.activeElement;
   let apt;
   if (id) {
     apt = state.apartments.find(a => a.id === id);
@@ -145,11 +200,16 @@ async function openModal(id) {
   }
   state.currentId = apt.id;
   fillModal(apt);
+  modalTitle.textContent = apt.title || apt.address || 'דירה חדשה';
   overlay.hidden = false;
+  document.body.classList.add('modal-open');
+  document.querySelector('.modal-scroll').scrollTop = 0;
+  document.getElementById('modalClose').focus({ preventScroll: true });
 }
 
 function fillModal(apt) {
   fieldEl('title').value = apt.title || '';
+  fieldEl('rooms').value = apt.rooms ?? '';
   fieldEl('price').value = apt.price ?? '';
   fieldEl('arnona').value = apt.arnona ?? '';
   fieldEl('vaad').value = apt.vaad_bayit ?? '';
@@ -169,11 +229,15 @@ function renderGallery(apt) {
     wrap.className = 'gimg-wrap';
     const el = document.createElement('img');
     el.src = '/uploads/' + img.filename;
+    el.alt = `תמונה של ${apt.title || apt.address || 'הדירה'}`;
     const del = document.createElement('button');
     del.className = 'gimg-del';
-    del.textContent = '✕';
+    del.type = 'button';
+    del.innerHTML = icons.close;
+    del.setAttribute('aria-label', 'מחיקת התמונה');
     del.onclick = async (e) => {
       e.stopPropagation();
+      if (!confirm('למחוק את התמונה הזו?')) return;
       await api('/api/images/' + img.id, { method: 'DELETE' });
       const apt2 = state.apartments.find(a => a.id === state.currentId);
       apt2.images = apt2.images.filter(i => i.id !== img.id);
@@ -190,7 +254,7 @@ function renderRatingsTable(apt) {
   ratingsTableEl.innerHTML = '';
   const head = document.createElement('div');
   head.className = 'rt-head';
-  head.innerHTML = `<div>קטגוריה</div><div>שחר</div><div>ענבל</div><div></div>`;
+  head.innerHTML = `<div>קטגוריה</div>${state.raters.map(rater => `<div>${escapeHtml(rater)}</div>`).join('')}<div></div>`;
   ratingsTableEl.appendChild(head);
 
   state.categories.forEach(cat => {
@@ -200,13 +264,24 @@ function renderRatingsTable(apt) {
     const nameDiv = document.createElement('div');
     nameDiv.className = 'rt-cat rt-cat-name';
     nameDiv.textContent = cat.name;
-    nameDiv.title = 'לחיצה כפולה לעריכת השם';
-    nameDiv.ondblclick = async () => {
+    nameDiv.title = 'לחיצה לעריכת השם';
+    nameDiv.tabIndex = 0;
+    nameDiv.setAttribute('role', 'button');
+    nameDiv.setAttribute('aria-label', `עריכת שם הקטגוריה ${cat.name}`);
+    const editCategory = async () => {
       const newName = prompt('שם קטגוריה:', cat.name);
       if (newName && newName.trim() && newName !== cat.name) {
         await api('/api/categories/' + cat.id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: newName.trim() }) });
         cat.name = newName.trim();
         nameDiv.textContent = cat.name;
+        nameDiv.setAttribute('aria-label', `עריכת שם הקטגוריה ${cat.name}`);
+      }
+    };
+    nameDiv.onclick = editCategory;
+    nameDiv.onkeydown = (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        editCategory();
       }
     };
     row.appendChild(nameDiv);
@@ -220,17 +295,25 @@ function renderRatingsTable(apt) {
       const existing = apt.ratings.find(r => r.category_id === cat.id && r.rater === rater);
       input.value = existing ? existing.score : '';
       input.placeholder = '–';
+      input.setAttribute('aria-label', `${cat.name}, ציון של ${rater}`);
       input.addEventListener('change', async () => {
         const val = input.value === '' ? null : Number(input.value);
         if (val !== null && (val < 1 || val > 10)) { toast('הציון חייב להיות בין 1 ל-10'); input.value = existing ? existing.score : ''; return; }
-        await api(`/api/apartments/${apt.id}/ratings`, {
-          method: 'PUT', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ rater, category_id: cat.id, score: val })
-        });
-        apt.ratings = apt.ratings.filter(r => !(r.category_id === cat.id && r.rater === rater));
-        if (val !== null) apt.ratings.push({ category_id: cat.id, rater, score: val });
-        renderFoot(apt);
-        render();
+        setSaveState('saving', 'שומר...');
+        try {
+          await api(`/api/apartments/${apt.id}/ratings`, {
+            method: 'PUT', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ rater, category_id: cat.id, score: val })
+          });
+          apt.ratings = apt.ratings.filter(r => !(r.category_id === cat.id && r.rater === rater));
+          if (val !== null) apt.ratings.push({ category_id: cat.id, rater, score: val });
+          renderFoot(apt);
+          render();
+          setSaveState('', 'נשמר אוטומטית');
+        } catch (error) {
+          setSaveState('error', 'לא נשמר');
+          toast('לא הצלחנו לשמור את הציון: ' + error.message);
+        }
       });
       cell.appendChild(input);
       row.appendChild(cell);
@@ -239,8 +322,10 @@ function renderRatingsTable(apt) {
     const delCell = document.createElement('div');
     const delBtn = document.createElement('button');
     delBtn.className = 'rt-del';
-    delBtn.textContent = '✕';
+    delBtn.type = 'button';
+    delBtn.innerHTML = icons.trash;
     delBtn.title = 'מחיקת קטגוריה';
+    delBtn.setAttribute('aria-label', `מחיקת הקטגוריה ${cat.name}`);
     delBtn.onclick = async () => {
       if (!confirm(`למחוק את הקטגוריה "${cat.name}"? הציונים שלה בכל הדירות יימחקו.`)) return;
       await api('/api/categories/' + cat.id, { method: 'DELETE' });
@@ -274,17 +359,31 @@ function renderFoot(apt) {
 }
 
 async function saveField(name, apiKey) {
-  const val = fieldEl(name).value;
-  const apt = state.apartments.find(a => a.id === state.currentId);
-  const body = { [apiKey || name]: val === '' ? null : val };
-  const updated = await api('/api/apartments/' + state.currentId, {
-    method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
-  });
-  Object.assign(apt, updated);
-  render();
+  setSaveState('saving', 'שומר...');
+  try {
+    const val = fieldEl(name).value;
+    const apt = state.apartments.find(a => a.id === state.currentId);
+    const body = { [apiKey || name]: val === '' ? null : val };
+    const updated = await api('/api/apartments/' + state.currentId, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    });
+    Object.assign(apt, updated);
+    modalTitle.textContent = apt.title || apt.address || 'דירה חדשה';
+    render();
+    setSaveState('', 'נשמר אוטומטית');
+  } catch (error) {
+    setSaveState('error', 'לא נשמר');
+    toast('לא הצלחנו לשמור: ' + error.message);
+  }
+}
+
+function setSaveState(className, label) {
+  autosaveState.className = 'autosave-state' + (className ? ` ${className}` : '');
+  autosaveState.innerHTML = `${className === 'error' ? icons.close : icons.check}<span>${label}</span>`;
 }
 
 fieldEl('title').addEventListener('change', () => saveField('title'));
+fieldEl('rooms').addEventListener('change', () => saveField('rooms'));
 fieldEl('price').addEventListener('change', () => saveField('price'));
 fieldEl('arnona').addEventListener('change', () => saveField('arnona'));
 fieldEl('vaad').addEventListener('change', () => saveField('vaad', 'vaad_bayit'));
@@ -299,12 +398,20 @@ document.getElementById('imageInput').addEventListener('change', async (e) => {
   if (!files.length) return;
   const fd = new FormData();
   for (const f of files) fd.append('images', f);
-  const created = await api(`/api/apartments/${state.currentId}/images`, { method: 'POST', body: fd });
-  const apt = state.apartments.find(a => a.id === state.currentId);
-  apt.images.push(...created);
-  renderGallery(apt);
-  render();
-  e.target.value = '';
+  setSaveState('saving', 'מעלה תמונות...');
+  try {
+    const created = await api(`/api/apartments/${state.currentId}/images`, { method: 'POST', body: fd });
+    const apt = state.apartments.find(a => a.id === state.currentId);
+    apt.images.push(...created);
+    renderGallery(apt);
+    render();
+    setSaveState('', 'נשמר אוטומטית');
+  } catch (error) {
+    setSaveState('error', 'ההעלאה נכשלה');
+    toast('לא הצלחנו להעלות את התמונות: ' + error.message);
+  } finally {
+    e.target.value = '';
+  }
 });
 
 document.getElementById('addCategoryBtn').addEventListener('click', async () => {
@@ -328,12 +435,37 @@ document.getElementById('deleteBtn').addEventListener('click', async () => {
 
 function closeModal() {
   overlay.hidden = true;
+  document.body.classList.remove('modal-open');
   state.currentId = null;
+  if (lastFocusedElement && document.contains(lastFocusedElement)) lastFocusedElement.focus();
 }
 document.getElementById('modalClose').addEventListener('click', closeModal);
 overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) closeModal(); });
+document.addEventListener('keydown', (e) => {
+  if (overlay.hidden) return;
+  if (e.key === 'Escape') {
+    closeModal();
+    return;
+  }
+  if (e.key === 'Tab') {
+    const focusable = [...document.getElementById('modal').querySelectorAll(
+      'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]'
+    )].filter(element => element.offsetParent !== null);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+});
 
 document.getElementById('openAddBtn').addEventListener('click', () => openModal(null));
+document.getElementById('mobileAddBtn').addEventListener('click', () => openModal(null));
+document.querySelector('.empty-add').addEventListener('click', () => openModal(null));
 
 loadAll().catch(err => toast('שגיאה בטעינה: ' + err.message));
