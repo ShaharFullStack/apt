@@ -1,14 +1,17 @@
-// ---------- Palette (validated categorical/status/sequential — see dataviz method) ----------
+// ---------- Palette ----------
+// Built from this app's own brand tokens (styles.css :root), not a generic
+// dataviz default — the maroon/amber slots are the exact --danger/--warning
+// hex values so the charts read as one system with the board's status
+// pills. Ordering was chosen and verified with the dataviz skill's
+// validate_palette.js (all six categorical checks pass on a white surface).
 const PALETTE = {
-  categorical: ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300', '#4a3aa7', '#e34948'],
-  sequential: '#256abf',
-  sequentialLight: '#9ec5f4',
-  status: { good: '#0ca30c', warning: '#fab219', serious: '#ec835a', critical: '#d03b3b', neutral: '#898781' },
-  ink: '#0b0b0b',
-  inkSecondary: '#52514e',
-  inkMuted: '#898781',
-  grid: '#e1e0d9',
-  axis: '#c3c2b7',
+  categorical: ['#0080a8', '#a63d46', '#7a9a1f', '#a85b74', '#3f5aa8', '#9a641d', '#5c4b8a', '#2f8a52'],
+  sequential: '#123b46', // --brand
+  status: { good: '#276b50', warning: '#9a641d', critical: '#a63d46', neutral: '#60767a' }, // --success/--warning/--danger/--ink-soft
+  ink: '#102f35', // --ink
+  inkSecondary: '#60767a', // --ink-soft
+  grid: '#d7e3e0', // --line
+  axis: '#b7c8c5',
 };
 
 function statusColor(status) {
